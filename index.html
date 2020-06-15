@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>podcast-player | A podcast player for the modern web</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/picnic">
+        <script src=https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.3/jsmediatags.min.js></script>
+<style>
+.pad1em{
+    padding: 1em;
+}
+table{
+    margin: 1em;
+    font-size: 80%;
+}
+table a{
+    cursor: pointer;
+}
+table a:hover{
+    text-decoration: underline;
+}
+audio{
+    width: 100%;
+}
+#chaptercontrols{
+    font-size: 85%;
+}
+#chaptercontrols article{
+    height: 100%;
+}
+#chaptercontrols article>header{
+    background: #0074d9;
+    color: white;
+}
+#chaptercontrols article:hover{
+    background: #0074d9;
+    color: white;
+    cursor: pointer;
+}
+td img{
+    height: 8em;
+}
+</style>
+    </head>
+    <body>
+        <input onchange=pp.open(event) type=file id=mp3 accept=audio/mp3>
+        <div class=pad1em>
+            <audio autoplay controls id=player></audio>
+            <table id=tags>
+            </table>
+            <div class="flex four" id=chaptercontrols></div>
+        </div>
+
+<script>
+var pp=pp||{}
+pp.open=(event)=>{
+    inp=event.target
+    document.querySelector('audio').src=URL.createObjectURL(inp.files[0])
+    jsmediatags.read(inp.files[0], {
+        onSuccess: pp.showTags
+    })
+}
+pp.showTags=(tags)=>{
+    pp.tags=tags
+    pp.tableReset()
+    if (tags.tags.picture) pp.setPicture(tags.tags.picture)
+    if (tags.tags.album) pp.addRow('album', tags.tags.album)
+    if (tags.tags.artist) pp.addRow('artist', tags.tags.artist)
+    if (tags.tags.title) pp.addRow('title', tags.tags.title)
+    if (tags.tags.year) pp.addRow('year', tags.tags.year)
+    if (tags.tags.genre) pp.addRow('genre', tags.tags.genre)
+    if (tags.tags.comment) pp.addRow('comment', tags.tags.comment.text)
+    if (tags.tags.lyrics) pp.addRow('lyrics', tags.tags.lyrics.lyrics)
+    if (tags.tags.TCOP) pp.addRow('copyright', tags.tags.TCOP.data)
+    if (tags.tags.CHAP) pp.addChapters(tags.tags.CHAP)
+}
+pp.setPicture=(pic)=>{
+    //console.log(pic)
+    let str=''
+    for (var i=0; i<pic.data.length; i++) {
+        str+=String.fromCharCode(pic.data[i])
+    }
+    var img='<img src=data:' + pic.format + ';base64,' + window.btoa(str) + '>'
+    pp.addRow('picture', img)
+}
+pp.addChapters=(chapters)=>{
+    //console.log(chapters)
+    for (var i=0; i<chapters.length; i++) {
+        var c=chapters[i]
+
+        //let link='<a onclick=pp.playfrom(' + c.data.startTime + ')>' + c.data.id + '</a>'
+        //let txt=c.data.subFrames.TIT2.data
+
+        let heading=c.data.subFrames.TIT2.data
+        let body=''
+        if (c.data.subFrames.TXXX) {
+            body = c.data.subFrames.TXXX.data.data
+        }
+        pp.addPanel(c.data.startTime, heading, body)
+    }
+}
+pp.addPanel=(startTime, heading, description)=>{
+    panel='<div data-tooltip="Click to play (' + startTime/1000 + 's)" class=tooltip-top><article class=card onclick=pp.playfrom(' + startTime + ')><header>' + heading + '</header><section>' + description + '</section></article></div>'
+    document.querySelector('#chaptercontrols').innerHTML+=panel
+}
+pp.playfrom=(t)=>{
+    var a=document.getElementById('player')
+    //console.log('playfrom', a, t)
+    a.currentTime=t/1000
+    if (a.paused) a.play()
+}
+pp.tableReset=()=>{
+    document.querySelector('#tags').innerHTML=''
+    document.querySelector('#chaptercontrols').innerHTML=''
+}
+pp.addRow=(name,value)=>{
+    var row=document.createElement('tr')
+    row.innerHTML='<th>'+name+'</th><td>'+value+'</td>'
+    document.getElementById('tags').appendChild(row)
+}
+</script>
+
+    </body>
+</html>
