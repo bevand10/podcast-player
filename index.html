@@ -3,6 +3,10 @@
     <head>
         <meta charset="utf-8">
         <title>podcast-player - a mp3 player built for the modern web</title>
+        <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png">
+        <link rel="manifest" href="./site.webmanifest">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/picnic">
         <script src=https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.3/jsmediatags.min.js></script>
 <style>
@@ -98,15 +102,25 @@ fieldset.demos button i{
 
 <script>
 var pp=pp||{}
+pp.getMeta=(url)=>{
+    console.log('getMeta',url)
+    fetch(url)
+        .then(resp=>resp.blob())
+        .then(blob=>{
+            console.log(blob)
+            jsmediatags.read(blob, {
+                onSuccess: pp.showTags
+            })
+        })
+}
 pp.demo=(i)=>{
     console.log('demo',i)
     if (i==1 || i==2) {
-        if (i==1) url='https://slicer-av.s3-eu-west-1.amazonaws.com/p08fh4tm.mp3'
-        if (i==2) url='https://slicer-av.s3-eu-west-1.amazonaws.com/p08fh4tm-withchapters.mp3'
+        if (i==1) url='https://slicer-av.s3-eu-west-1.amazonaws.com/p08fh4tm-16k.mp3'
+        if (i==2) url='https://slicer-av.s3-eu-west-1.amazonaws.com/p08fh4tm-withchapters-16k.mp3'
         document.querySelector('audio').src=url
-        jsmediatags.read(url, {
-            onSuccess: pp.showTags
-        })
+        pp.tableReset()
+        pp.getMeta(url)
     }
 }
 pp.open=(event)=>{
