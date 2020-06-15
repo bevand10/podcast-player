@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title>podcast-player | A podcast player for the modern web</title>
+        <title>podcast-player - a mp3 player built for the modern web</title>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/picnic">
         <script src=https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.3/jsmediatags.min.js></script>
 <style>
@@ -40,16 +40,52 @@ audio{
 td img{
     height: 8em;
 }
+main{
+    margin-top: 60px;
+    padding: 1em;
+}
+fieldset p{
+    margin-top: 0;
+}
+fieldset{
+    margin-bottom: 1em;
+}
+h4.full{
+    background: #ffebc5;
+    border: 1px solid silver;
+    border-radius: .5em;
+    margin-bottom: 1em;
+    margin-left: 0.6em;
+}
+nav{
+    background: #ffebc5;
+    border-bottom: 1px solid silver;
+    padding: 0.6em;
+}
+fieldset p{
+    font-weight: bold;
+}
+fieldset input{
+    background: green;
+    color: white !important;
+    border-radius: 0.2em;
+}
 </style>
     </head>
     <body>
-        <input onchange=pp.open(event) type=file id=mp3 accept=audio/mp3>
-        <div class=pad1em>
+        <nav>Podcast Player - a mp3 player for the modern web</nav>
+        <main>
+            <fieldset>
+                <p>
+                Select a podcast file (mp3) from your system
+                </p>
+                <input onchange=pp.open(event) type=file id=mp3 accept=audio/mp3>
+            </fieldset>
             <audio autoplay controls id=player></audio>
             <table id=tags>
             </table>
             <div class="flex four" id=chaptercontrols></div>
-        </div>
+        </main>
 
 <script>
 var pp=pp||{}
@@ -85,6 +121,7 @@ pp.setPicture=(pic)=>{
 }
 pp.addChapters=(chapters)=>{
     //console.log(chapters)
+    document.querySelector('#chaptercontrols').innerHTML='<h4 class=full>Chapter controls</h4>'
     for (var i=0; i<chapters.length; i++) {
         var c=chapters[i]
 
