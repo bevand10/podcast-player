@@ -70,14 +70,23 @@ fieldset input{
     color: white !important;
     border-radius: 0.2em;
 }
+fieldset.demos button i{
+    color: yellow;
+    text-transform: uppercase;
+    font-weight: bold;
+}
 </style>
     </head>
     <body>
         <nav>Podcast Player - a mp3 player for the modern web</nav>
         <main>
+            <fieldset class=demos>
+                <button onclick=pp.demo(1)>Demo 1 - a BBC Global News Podcast</button>
+                <button onclick=pp.demo(2)>Demo 2 - a BBC Global News Podcast <i>with chapters</i></button>
+            </fieldset>
             <fieldset>
                 <p>
-                Select a podcast file (mp3) from your system
+                Select a podcast file (mp3) from your own system
                 </p>
                 <input onchange=pp.open(event) type=file id=mp3 accept=audio/mp3>
             </fieldset>
@@ -89,6 +98,17 @@ fieldset input{
 
 <script>
 var pp=pp||{}
+pp.demo=(i)=>{
+    console.log('demo',i)
+    if (i==1 || i==2) {
+        if (i==1) url='https://slicer-av.s3-eu-west-1.amazonaws.com/p08fh4tm.mp3'
+        if (i==2) url='https://slicer-av.s3-eu-west-1.amazonaws.com/p08fh4tm-withchapters.mp3'
+        document.querySelector('audio').src=url
+        jsmediatags.read(url, {
+            onSuccess: pp.showTags
+        })
+    }
+}
 pp.open=(event)=>{
     inp=event.target
     document.querySelector('audio').src=URL.createObjectURL(inp.files[0])
